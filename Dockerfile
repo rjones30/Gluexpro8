@@ -5,20 +5,22 @@
 # author: richard.t.jones at uconn.edu
 # version: september 7, 2021
 #
-# usage: [as root] $ docker build Dockerfile .
+# usage: [as root] $ docker build -t rjones30/gluexpro8 .
 #
 
-FROM registry.access.redhat.com/ubi8/ubi:8.1
+#FROM registry.access.redhat.com/ubi8/ubi:8.1
+FROM centos:8
 
 # install a few utility rpms
-RUN yum -y install bind-utils util-linux which wget tar procps less file dump gcc gcc-c++ gcc-gfortran gdb gdb-gdbserver strace openssh-server
-RUN yum -y install vim-common vim-filesystem docker-io-vim vim-minimal vim-enhanced vim-X11
-RUN yum -y install qt qt-x11 qt-devel
-RUN yum -y install motif-devel libXpm-devel libXmu-devel libXp-devel
-RUN yum -y install java-1.8.0-openjdk
-RUN yum -y install blas lapack
-RUN yum -y install python3 python3-devel python3-pip
-RUN yum -y install postgresql-devel
+RUN dnf -y install bind-utils util-linux which wget tar procps less file dump gcc gcc-c++ gcc-gfortran gdb gdb-gdbserver strace openssh-server
+RUN dnf -y install vim-common vim-filesystem vim-minimal vim-enhanced vim-X11
+RUN dnf config-manager --set-enabled powertools
+RUN dnf -y install qt5-devel
+RUN dnf -y install motif-devel libXpm-devel libXmu-devel libXp-devel
+RUN dnf -y install java-1.8.0-openjdk
+RUN dnf -y install blas lapack
+RUN dnf -y install python3 python3-devel python3-pip
+RUN dnf -y install postgresql-devel
 RUN wget --no-check-certificate https://zeus.phys.uconn.edu/halld/gridwork/libtbb.tgz
 RUN tar xf libtbb.tgz -C /
 RUN rm libtbb.tgz
@@ -26,24 +28,24 @@ RUN rm libtbb.tgz
 # install the osg worker node client packages
 RUN rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
 # work-around for problems using the EPEL mirrors (repomd.xml does not match metalink for epel)
-RUN sed -i 's/^#baseurl/baseurl/' /etc/yum.repos.d/epel.repo
-RUN sed -i 's/^metalink/#metalink/' /etc/yum.repos.d/epel.repo
+#RUN sed -i 's/^#baseurl/baseurl/' /etc/dnf.repos.d/epel.repo
+#RUN sed -i 's/^metalink/#metalink/' /etc/dnf.repos.d/epel.repo
 # end of work-around
-RUN yum -y install yum-plugin-priorities
-RUN rpm -Uvh https://repo.opensciencegrid.org/osg/3.4/osg-3.4-el7-release-latest.rpm
-RUN yum -y install osg-wn-client
+#RUN dnf -y install yum-plugin-priorities
+RUN rpm -Uvh https://repo.opensciencegrid.org/osg/3.5/el8/release/x86_64/osg-release-3.5-7.osg35.el8.noarch.rpm
+RUN dnf -y install osg-wn-client
 RUN wget --no-check-certificate https://zeus.phys.uconn.edu/halld/gridwork/dcache-srmclient-3.0.11-1.noarch.rpm
 RUN rpm -Uvh dcache-srmclient-3.0.11-1.noarch.rpm
 RUN rm dcache-srmclient-3.0.11-1.noarch.rpm
 
 # install some additional packages that might be useful
-RUN yum -y install apr apr-util atlas autoconf automake bc cmake cmake3 git scons bzip2-devel boost-python36
-RUN yum -y install gsl gsl-devel libgnome-keyring lyx-fonts m4 neon pakchois mariadb mariadb-libs mariadb-devel
-RUN yum -y install perl-File-Slurp perl-Test-Harness perl-Thread-Queue perl-XML-NamespaceSupport perl-XML-Parser perl-XML-SAX perl-XML-SAX-Base perl-XML-Simple perl-XML-Writer
-RUN yum -y install subversion subversion-libs
-RUN yum -y install python2-pip python-devel
-RUN yum -y install hdf5 hdf5-devel
-RUN yum -y install valgrind
+RUN dnf -y install apr apr-util atlas autoconf automake bc cmake cmake3 git python3-scons bzip2-devel boost-python3
+RUN dnf -y install gsl gsl-devel lyx-fonts m4 neon pakchois mariadb-devel
+RUN dnf -y install perl-File-Slurp perl-Test-Harness perl-Thread-Queue perl-XML-NamespaceSupport perl-XML-Parser perl-XML-SAX perl-XML-SAX-Base perl-XML-Simple perl-XML-Writer
+RUN dnf -y install subversion subversion-libs
+RUN dnf -y install python2-pip python2-devel python3-pip python3-devel
+RUN dnf -y install hdf5 hdf5-devel
+RUN dnf -y install valgrind
 RUN pip2 install future numpy==1.16.6
 RUN pip3 install psycopg2
 RUN pip3 install --upgrade pip
