@@ -28,11 +28,7 @@ RUN rm libtbb.tgz
 # install the osg worker node client packages
 RUN rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
 # work-around for problems using the EPEL mirrors (repomd.xml does not match metalink for epel)
-#RUN sed -i 's/^#baseurl/baseurl/' /etc/dnf.repos.d/epel.repo
-#RUN sed -i 's/^metalink/#metalink/' /etc/dnf.repos.d/epel.repo
-# end of work-around
-#RUN dnf -y install yum-plugin-priorities
-RUN rpm -Uvh https://repo.opensciencegrid.org/osg/3.5/el8/release/x86_64/osg-release-3.5-7.osg35.el8.noarch.rpm
+RUN rpm -Uvh https://repo.opensciencegrid.org/osg/3.6/osg-3.6-el8-release-latest.rpm
 RUN dnf -y install osg-wn-client
 RUN wget --no-check-certificate https://zeus.phys.uconn.edu/halld/gridwork/dcache-srmclient-3.0.11-1.noarch.rpm
 RUN rpm -Uvh dcache-srmclient-3.0.11-1.noarch.rpm
@@ -51,6 +47,15 @@ RUN pip3 install psycopg2
 RUN pip3 install --upgrade pip
 RUN python3 -m pip install numpy==1.19.5
 
+# install the intel compilers
+RUN wget --no-check-certificate https://zeus.phys.uconn.edu/halld/gridwork/Intel_oneAPI.repo
+RUN mv Intel_oneAPI.repo /etc/yum.repos.d/
+RUN dnf -y install intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic
+RUN dnf -y install intel-oneapi-compiler-fortran
+# some bits from intel-basekit,intel-hpckit that look useful
+#RUN dnf -y install intel-basekit intel-hpckit
+RUN dnf -y install intel-oneapi-mkl-devel intel-oneapi-mpi-devel
+
 # create mount point for sim-recon, simlinks in /usr/local
 RUN wget --no-check-certificate https://zeus.phys.uconn.edu/halld/gridwork/local.tar.gz
 RUN mv /usr/sbin/sshd /usr/sbin/sshd_orig
@@ -58,8 +63,14 @@ RUN tar xf local.tar.gz -C /
 RUN rm local.tar.gz
 RUN rm -rf /hdpm
 
+# add the molpro and octopus applications, these must be bind-mounted under the build dir
+ADD opt/octopus /opt/octopus
+ADD opt/molpro /opt/molpro
+RUN wget --no-check-certificate https://zeus.phys.uconn.edu/halld/gridwork/libgfortran.tar
+RUN tar xf libgfortran.tar -C / usr/lib64/libgfortran.so.3 usr/lib64/libgfortran.so.3.0.0 usr/lib64/libgfortran.so.4 usr/lib64/libgfortran.so.4.0.0
+
 # make the cvmfs filesystem visible inside the container
 VOLUME /cvmfs/oasis.opensciencegrid.org
 
-# set the default build for sim_recon
-RUN ln -s /cvmfs/oasis.opensciencegrid.org/gluex/.hdpm /usr/local/
+# add the README
+COPY README.md /
