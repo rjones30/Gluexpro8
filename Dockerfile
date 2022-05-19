@@ -9,7 +9,10 @@
 #
 
 #FROM registry.access.redhat.com/ubi8/ubi:8.1
-FROM centos:8
+#FROM centos:8
+FROM roboxes/centos8
+#FROM oraclelinux:8
+#FROM rockylinux
 
 # install a few utility rpms
 RUN dnf -y install bind-utils util-linux which wget tar procps less file dump gcc gcc-c++ gcc-gfortran gdb gdb-gdbserver strace openssh-server
@@ -26,7 +29,7 @@ RUN tar xf libtbb.tgz -C /
 RUN rm libtbb.tgz
 
 # install the osg worker node client packages
-RUN rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+#RUN rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
 # work-around for problems using the EPEL mirrors (repomd.xml does not match metalink for epel)
 RUN rpm -Uvh https://repo.opensciencegrid.org/osg/3.6/osg-3.6-el8-release-latest.rpm
 RUN dnf -y install osg-wn-client
@@ -41,6 +44,7 @@ RUN dnf -y install perl-File-Slurp perl-Test-Harness perl-Thread-Queue perl-XML-
 RUN dnf -y install subversion subversion-libs
 RUN dnf -y install python2-pip python2-devel python3-pip python3-devel
 RUN dnf -y install hdf5 hdf5-devel
+RUN dnf -y reinstall kernel-headers
 RUN dnf -y install valgrind
 RUN pip2 install future numpy==1.16.6
 RUN pip3 install psycopg2
