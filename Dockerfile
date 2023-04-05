@@ -31,6 +31,9 @@ RUN rm libtbb.tgz
 # install the osg worker node client packages
 #RUN rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
 # work-around for problems using the EPEL mirrors (repomd.xml does not match metalink for epel)
+RUN wget --no-check-certificate https://zeus.phys.uconn.edu/halld/gridwork/json-c-0.13.1-3.el8.x86_64.rpm
+RUN rpm -Uvh json-c-0.13.1-3.el8.x86_64.rpm
+RUN rm json-c-0.13.1-3.el8.x86_64.rpm
 RUN rpm -Uvh https://repo.opensciencegrid.org/osg/3.6/osg-3.6-el8-release-latest.rpm
 RUN dnf -y install osg-wn-client
 RUN wget --no-check-certificate https://zeus.phys.uconn.edu/halld/gridwork/dcache-srmclient-3.0.11-1.noarch.rpm
@@ -59,6 +62,9 @@ RUN dnf -y install intel-oneapi-compiler-fortran
 # some bits from intel-basekit,intel-hpckit that look useful
 #RUN dnf -y install intel-basekit intel-hpckit
 RUN dnf -y install intel-oneapi-mkl-devel intel-oneapi-mpi-devel
+RUN dnf -y install blas-devel lapack-devel
+RUN dnf -y install mt-st gd-devel gmp-devel mpfr-devel
+RUN dnf -y install compat-openssl10
 
 # create mount point for sim-recon, simlinks in /usr/local
 RUN wget --no-check-certificate https://zeus.phys.uconn.edu/halld/gridwork/local.tar.gz
@@ -67,9 +73,14 @@ RUN tar xf local.tar.gz -C /
 RUN rm local.tar.gz
 RUN rm -rf /hdpm
 
-# add the molpro and octopus applications, these must be bind-mounted under the build dir
-ADD opt/octopus /opt/octopus
-ADD opt/molpro /opt/molpro
+# add the molpro and octopus applications
+#ADD opt/octopus /opt/octopus
+#ADD opt/molpro /opt/molpro
+COPY octopus_8.tgz /octopus_8.tgz
+RUN tar zxf /octopus_8.tgz -C /opt
+COPY molpro_8.tgz /molpro_8.tgz
+RUN tar zxf /molpro_8.tgz -C /opt
+RUN rm /octopus_8.tgz /molpro_8.tgz
 RUN wget --no-check-certificate https://zeus.phys.uconn.edu/halld/gridwork/libgfortran.tar
 RUN tar xf libgfortran.tar -C / usr/lib64/libgfortran.so.3 usr/lib64/libgfortran.so.3.0.0 usr/lib64/libgfortran.so.4 usr/lib64/libgfortran.so.4.0.0
 
