@@ -1,4 +1,4 @@
-tag=rjones30/gluexpro8:latest
+tag=docker.io/rjones30/gluexpro8:latest
 docker build --tag $tag .
 if [[ $? == 0 ]]; then
     echo -n "docker build --tag $tag completed successfully, to update the image "
