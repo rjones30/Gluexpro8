@@ -84,6 +84,9 @@ RUN rm /octopus_8.tgz /molpro_8.tgz
 RUN wget --no-check-certificate https://zeus.phys.uconn.edu/halld/gridwork/libgfortran.tar
 RUN tar xf libgfortran.tar -C / usr/lib64/libgfortran.so.3 usr/lib64/libgfortran.so.3.0.0 usr/lib64/libgfortran.so.4 usr/lib64/libgfortran.so.4.0.0
 
+# add some packages that are needed for the kshell nuclear structure code
+RUN yum -y install ucx libevent openmp openmpi openmpi-devel
+
 # make the cvmfs filesystem visible inside the container
 VOLUME /cvmfs/oasis.opensciencegrid.org
 
