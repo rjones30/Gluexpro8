@@ -10,9 +10,10 @@
 
 #FROM registry.access.redhat.com/ubi8/ubi:8.1
 #FROM centos:8
-FROM roboxes/centos8
+#FROM roboxes/centos8
 #FROM oraclelinux:8
 #FROM rockylinux
+FROM almalinux:8
 
 # install a few utility rpms
 RUN dnf -y install bind-utils util-linux which wget tar procps less file dump gcc gcc-c++ gcc-gfortran gdb gdb-gdbserver strace openssh-server
@@ -29,11 +30,11 @@ RUN tar xf libtbb.tgz -C /
 RUN rm libtbb.tgz
 
 # install the osg worker node client packages
-#RUN rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+RUN rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
 # work-around for problems using the EPEL mirrors (repomd.xml does not match metalink for epel)
-RUN wget --no-check-certificate https://zeus.phys.uconn.edu/halld/gridwork/json-c-0.13.1-3.el8.x86_64.rpm
-RUN rpm -Uvh json-c-0.13.1-3.el8.x86_64.rpm
-RUN rm json-c-0.13.1-3.el8.x86_64.rpm
+#RUN wget --no-check-certificate https://zeus.phys.uconn.edu/halld/gridwork/json-c-0.13.1-3.el8.x86_64.rpm
+#RUN rpm -Uvh json-c-0.13.1-3.el8.x86_64.rpm
+#RUN rm json-c-0.13.1-3.el8.x86_64.rpm
 RUN rpm -Uvh https://repo.opensciencegrid.org/osg/3.6/osg-3.6-el8-release-latest.rpm
 RUN dnf -y install osg-wn-client
 RUN wget --no-check-certificate https://zeus.phys.uconn.edu/halld/gridwork/dcache-srmclient-3.0.11-1.noarch.rpm
@@ -76,11 +77,13 @@ RUN rm -rf /hdpm
 # add the molpro and octopus applications
 #ADD opt/octopus /opt/octopus
 #ADD opt/molpro /opt/molpro
-COPY octopus_8.tgz /octopus_8.tgz
-RUN tar zxf /octopus_8.tgz -C /opt
-COPY molpro_8.tgz /molpro_8.tgz
-RUN tar zxf /molpro_8.tgz -C /opt
-RUN rm /octopus_8.tgz /molpro_8.tgz
+#COPY octopus_8.tgz /octopus_8.tgz
+RUN wget --no-check-certificate https://zeus.phys.uconn.edu/halld/gridwork/octopus_8.tgz
+RUN tar zxf octopus_8.tgz -C /opt
+#COPY molpro_8.tgz /molpro_8.tgz
+RUN wget --no-check-certificate https://zeus.phys.uconn.edu/halld/gridwork/molpro_8.tgz
+RUN tar zxf molpro_8.tgz -C /opt
+RUN rm octopus_8.tgz molpro_8.tgz
 RUN wget --no-check-certificate https://zeus.phys.uconn.edu/halld/gridwork/libgfortran.tar
 RUN tar xf libgfortran.tar -C / usr/lib64/libgfortran.so.3 usr/lib64/libgfortran.so.3.0.0 usr/lib64/libgfortran.so.4 usr/lib64/libgfortran.so.4.0.0
 
